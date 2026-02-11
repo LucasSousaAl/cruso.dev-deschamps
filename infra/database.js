@@ -1,4 +1,4 @@
-import { Client } from "pg";
+import { Client, Pool } from "pg";
 
 
 async function query(queryObject){
@@ -10,10 +10,19 @@ async function query(queryObject){
     password: process.env.POSTGRES_PASSWORD
   });
   await client.connect();
-  const res = await client.query(queryObject);
-  await client.end();
-  return res.rows; 
+  try{
+    const res = await client.query(queryObject);
+    return res.rows; 
+  }catch(error){
+    console.error("Database query error:", error);
+  }
+  finally{
+    await client.end();
+  }
 }
+
+
+
 export default {
   query: query 
 };
